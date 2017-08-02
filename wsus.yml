@@ -1,0 +1,28 @@
+# This playbook installs and enables IIS on Windows hosts
+
+- name: Install WSUS
+  hosts: wsus
+  gather_facts: false
+  tasks:
+    - name: Install WSUS
+      win_feature:
+        name: UpdateServices
+        state: present
+        include_management_tools: yes
+        
+    - name: Create WSUS directory
+      win_file:
+       path: C:\WSUS
+       state: directory
+
+    - name: Change the working directory to C:\Program Files\Update Services\Tools\ before executing WsusUtil.
+      win_shell: .\WsusUtil.exe PostInstall CONTENT_DIR=C:\WSUS 
+      args:
+        chdir: C:\Program Files\Update Services\Tools\
+
+    - name: Download and Install ReportViewer 2008 from artefact repository
+      win_package:
+        name: Microsoft ReportViewer 2008
+        path: http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe
+        product_id: '{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}'
+        arguments: /install /passive /norestart
