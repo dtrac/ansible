@@ -39,7 +39,7 @@
         arguments: /q
     
     - name: Run powershell script to configure WSUS
-      script: files/configureWsus.ps1
+      script: scripts/configureWsus.ps1
 
     
 

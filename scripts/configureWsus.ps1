@@ -13,6 +13,26 @@ Set-WsusServerSynchronization –SyncFromMU
 $wsusConfig.AllUpdateLanguagesEnabled = $false
 $wsusConfig.SetEnabledUpdateLanguages("en")
 $wsusConfig.Save()
+Start-Sleep 5
+
+# Set Proxy Settings
+$wsusConfig.UseProxy = $true
+$wsusConfig.ProxyName = '192.168.211.33'
+$wsusConfig.ProxyServerPort = '80'
+$wsusConfig.Save()
+Start-Sleep 5
+
+
+# Perform initial sync to get latest Categories
+$subscription = $wsus.GetSubscription()
+$subscription.StartSynchronizationForCategoryOnly()
+Start-Sleep 30
+do  {
+    Start-Sleep 5
+    }
+until ( $subscription.GetSynchronizationProgress().ProcessedItems -eq $subscription.GetSynchronizationProgress().TotalItems)
+
+write-host "Category Sync Complete"
 
 # Configure the Platforms that we want WSUS to receive updates
 write-host 'Setting WSUS Products'
@@ -33,6 +53,7 @@ Get-WsusClassification | Where-Object {
 
 # Configure Synchronizations
 write-host 'Enabling WSUS Automatic Synchronisation'
+$subscription = $wsus.GetSubscription()
 $subscription.SynchronizeAutomatically=$true
 
 # Set synchronization scheduled for midnight each night
