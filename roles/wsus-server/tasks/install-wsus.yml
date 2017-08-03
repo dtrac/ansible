@@ -12,7 +12,7 @@
 
     - name: Create WSUS directory
       win_file:
-       path: C:\WSUS
+       path: D:\WSUS
        state: directory
 
     - name: Change the working directory to C:\Program Files\Update Services\Tools\ before executing WsusUtil.
@@ -27,20 +27,19 @@
 
     - name: Download Report Viewer 2008 to specified path
       win_get_url:
-        url: https://download.microsoft.com/download/2/d/8/2d889b35-c4db-49c6-ae19-e5a0c7c2b24d/ReportViewer.exe
+        url: http://wtr-watm-artefactrepo.johnlewis.co.uk:8081/nexus/service/local/repositories/A0466-VRA-Releases/content/Microsoft/Windows/Packages/reportViewer/2008/reportViewer-2008.exe
         dest: C:\Windows\Temp\ReportViewer.exe
         force: yes
         skip_certificate_validation: true
-    
+
     - name: Install Report Viewer 2008
       win_package:
         path: C:\Windows\Temp\ReportViewer.exe
         product_id: '{5E152D08-572A-3375-8FDE-DAD1EFB379BA}'
         arguments: /q
-    
+
     - name: Run powershell script to configure WSUS
       script: scripts/configureWsus.ps1
 
-    
 
-        
+
