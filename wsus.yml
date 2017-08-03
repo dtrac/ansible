@@ -1,4 +1,4 @@
-# This playbook installs and enables IIS on Windows hosts
+# This playbook installs and enables WSUS on Windows hosts
 
 - name: Install WSUS
   hosts: wsus
@@ -20,9 +20,27 @@
       args:
         chdir: C:\Program Files\Update Services\Tools\
 
-    - name: Download and Install ReportViewer 2008 from artefact repository
+    - name: Install .NetFW 3.5 for Report Viewer 2008
+      win_feature:
+        name: NET-Framework-Core
+        state: present
+
+    - name: Download Report Viewer 2008 to specified path
+      win_get_url:
+        url: https://download.microsoft.com/download/2/d/8/2d889b35-c4db-49c6-ae19-e5a0c7c2b24d/ReportViewer.exe
+        dest: C:\Windows\Temp\ReportViewer.exe
+        force: yes
+        skip_certificate_validation: true
+    
+    - name: Install Report Viewer 2008
       win_package:
-        name: Microsoft ReportViewer 2008
-        path: http://wtr-watm-artefactrepo.johnlewis.co.uk:8081/nexus/service/local/repositories/A0466-VRA-Releases/content/Microsoft/Windows/Packages/reportViewer/2008/reportViewer-2008.exe
+        path: C:\Windows\Temp\ReportViewer.exe
         product_id: '{5E152D08-572A-3375-8FDE-DAD1EFB379BA}'
-        arguments: /install /passive /norestart
+        arguments: /q
+    
+    - name: Run powershell script to configure WSUS
+      script: files/configureWsus.ps1
+
+    
+
+        
