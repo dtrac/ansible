@@ -1,6 +1,0 @@
-    - name: Install ReportViewer 2008 from artefact repository
-      win_package:
-        name: Microsoft ReportViewer 2008
-        path: http://wtr-watm-artefactrepo.johnlewis.co.uk:8081/nexus/service/local/repositories/A0466-VRA-Releases/content/Microsoft/Windows/Packages/reportViewer/2008/reportViewer-2008.exe
-        product_id: '{5E152D08-572A-3375-8FDE-DAD1EFB379BA}'
-        arguments: /install /passive /norestart
