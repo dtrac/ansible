@@ -2,6 +2,8 @@
 
 - name: Install WSUS
   hosts: wsus
+  vars:
+       reportviewer_download: <REDACTED>
   gather_facts: false
   tasks:
     - name: Install WSUS
@@ -27,7 +29,7 @@
 
     - name: Download Report Viewer 2008 to specified path
       win_get_url:
-        url: http://wtr-watm-artefactrepo.johnlewis.co.uk:8081/nexus/service/local/repositories/A0466-VRA-Releases/content/Microsoft/Windows/Packages/reportViewer/2008/reportViewer-2008.exe
+        url: "{{ reportviewer_download }}"
         dest: C:\Windows\Temp\ReportViewer.exe
         force: yes
         skip_certificate_validation: true
