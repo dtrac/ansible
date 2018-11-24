@@ -1,0 +1,8 @@
+---
+- name: Disable NetBIOS
+  vars:
+    interface_alias: "{{ ansible_interfaces[0].connection_name }}"
+  win_dsc:
+    resource_name: NetBios
+    InterfaceAlias: "{{ interface_alias }}"
+    Setting: 'Disable'

@@ -1,0 +1,6 @@
+---
+- name: Windows Base Build
+  hosts: all
+
+  roles:
+  - common

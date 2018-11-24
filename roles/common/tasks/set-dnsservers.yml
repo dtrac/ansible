@@ -1,0 +1,11 @@
+  - name: Set DNS servers
+    win_dns_client:
+      adapter_names: '*'
+      ipv4_addresses:
+      - "{{ dns_server_primary }}"
+      - "{{ dns_server_secondary }}"
+
+  - name: Run ipconfig on hosts
+    raw: ipconfig
+    register: ipconfig
+  - debug: var=ipconfig

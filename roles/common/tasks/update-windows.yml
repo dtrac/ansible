@@ -1,0 +1,7 @@
+- name: Install all security and critical updates
+  win_updates:
+     category_names:
+       - SecurityUpdates
+       - CriticalUpdates
+     state: searched
+     log_path: C:\Temp\ansible_wu.log

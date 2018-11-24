@@ -1,0 +1,11 @@
+---
+- name: Adds PowerShell module(s)
+  win_psmodule:
+    name: "{{ item }}"
+    state: present
+  with_items: 
+  - NetworkingDsc
+  register: psmodule_output
+
+- debug: 
+    var: psmodule_output.results[0].output

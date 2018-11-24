@@ -1,0 +1,6 @@
+  - name: Add server administrators domain group to local administrators
+    win_group_membership:
+      name: Administrators
+      members:
+        - "{{ domain_name + ad_group }}"
+      state: present

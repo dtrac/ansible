@@ -1,0 +1,47 @@
+  - name: Registry :- WindowsUpdateAU
+    win_dsc:
+      resource_name: Registry
+      Ensure: Present
+      Key: HKEY_LOCAL_MACHINE\software\policies\Microsoft\Windows\WindowsUpdate\AU
+      ValueName: UseWUServer
+      ValueData: 1
+
+  - name: Registry :- WindowsUpdateServer
+    win_dsc:
+      resource_name: Registry
+      Ensure: Present
+      Key: HKEY_LOCAL_MACHINE\software\policies\Microsoft\Windows\WindowsUpdate
+      ValueName: WUServer
+      ValueData: "{{ wsus_server }}"
+
+  - name: Registry :- SetProductCompatibility
+    win_dsc:
+      resource_name: Registry
+      Ensure: Present
+      Key: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\QualityCompat
+      ValueName: cadca5fe-87d3-4b96-b7fb-a231484277cc
+      ValueData: 0
+
+  - name: Registry :- FeatureSettingsOverride
+    win_dsc:
+      resource_name: Registry
+      Ensure: Present
+      Key: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
+      ValueName: FeatureSettingsOverride
+      ValueData: 0
+
+  - name: Registry :- FeatureSettingsOverrideMask
+    win_dsc:
+      resource_name: Registry
+      Ensure: Present
+      Key: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management
+      ValueName: FeatureSettingsOverrideMask
+      ValueData: 3
+
+  - name: Registry :- MinVmVersionForCpuBasedMitigations
+    win_dsc:
+      resource_name: Registry
+      Ensure: Present
+      Key: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization
+      ValueName: MinVmVersionForCpuBasedMitigations
+      ValueData: "1.0"

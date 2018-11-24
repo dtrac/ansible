@@ -1,0 +1,10 @@
+---
+- import_tasks: set-registry.yml
+- import_tasks: disable-netbios.yml
+- import_tasks: disable-ipv6.yml
+- import_tasks: install-psmodules.yml
+- import_tasks: install-packages.yml
+- import_tasks: set-dnsservers.yml
+- import_tasks: join-domain.yml
+- import_tasks: add-groups.yml
+- import_tasks: update-windows.yml

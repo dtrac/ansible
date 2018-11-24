@@ -1,0 +1,13 @@
+---
+- name: Disable IPv6
+  win_dsc:
+    resource_name: Registry
+    Ensure: Present
+    Key: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\
+    ValueName: DisabledComponents
+    ValueData: 0xFF
+    ValueType: Dword
+  register: ipv6_disabled
+
+- win_reboot:
+  when: ipv6_disabled.reboot_required

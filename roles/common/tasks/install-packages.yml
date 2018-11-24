@@ -1,0 +1,22 @@
+  #- name: Remove public chocolatey repo
+  #  win_chocolatey_source:
+  #    name: chocolatey
+  #    state: absent
+
+  #- name: Add local chocolatey repo
+  #  win_chocolatey_source:
+  #    name: "{{ internal_repo_name }}"
+  #    state: present
+  #    source: "{{ internal_repo_url }}"
+
+  - name: Install chocolatey packages
+    win_chocolatey:
+      name: "{{ item }}"
+      state: present
+      #source: nexus
+    with_items:
+      - git.install
+      - 7zip
+      - dotnet4.5
+      - powershell
+      - vmware-tools
