@@ -1,0 +1,11 @@
+---
+- name: upgrade PowerShell to v5
+  hosts: windows
+  tasks:
+  - name: upgrade PowerShell
+    win_chocolatey:
+      name: powershell
+      state: latest
+    become: yes
+    become_user: SYSTEM
+    become_method: runas
