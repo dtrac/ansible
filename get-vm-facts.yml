@@ -1,0 +1,37 @@
+---
+ - name: Get VM Facts
+   hosts: localhost
+   connection: local
+   gather_facts: no
+
+  vars_prompt:
+    name: vcenter_hostname
+    prompt: "Enter vCenter hostname"
+    name: vcenter_username
+    prompt: "Enter vCenter user name"
+    name: vcenter_password
+    prompt: "Enter password for {{ vcenter_username }}"
+    name: vmsphere_datacenter
+    prompt: "Enter vSphere Datacenter name"
+    name: vm_name
+    prompt: "Enter VM name"
+
+   tasks:
+     - name: Get VM Facts for dant-ansible-test
+       vmware_guest_facts:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ vsphere_datacenter }}"
+        name: "{{ vm_name }}"
+       delegate_to: localhost
+       register: vmware_facts
+
+     - name: Display VMware facts
+       debug:
+         var: vmware_facts.instance.instance_uuid
+
+     - name: Display VMware facts as debug message
+       debug:
+         msg: "VM UUID is {{ vmware_facts.instance.instance_uuid }}"
