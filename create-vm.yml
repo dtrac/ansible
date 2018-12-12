@@ -1,0 +1,50 @@
+---
+ - name: Clone a virtual machine from Windows template and customize
+   hosts: localhost
+   connection: local
+   gather_facts: no
+
+   vars_prompt:
+    name: vcenter_hostname
+    prompt: "Enter vCenter hostname"
+    name: vcenter_username
+    prompt: "Enter vCenter user name"
+    name: vcenter_password
+    prompt: "Enter password for {{ vcenter_username }}"
+    name: vsphere_datacenter
+    prompt: "Enter vSphere Datacenter name"
+    name: vsphere_cluster
+    prompt: "Enter vSphere Cluster name"
+    name: vm_name
+    prompt: "Enter VM name"
+
+   tasks:
+     - name: Clone from template
+       vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ vsphere_datacenter }}"
+        cluster: "{{ vsphere_cluster }}"
+        name: "{{ vm_name }}"
+        template: "{{ vm_template }}"
+        folder: /VRM
+        networks:
+        - name: "{{ vsphere_network }}"
+          ip: 1.1.1.1
+          netmask: 255.255.255.0
+          gateway: 1.1.1.2
+          domain: "{{ ad_domain }}"
+          dns_servers:
+          - "{{ dns_1 }}"
+          - "{{ dns_2 }}"
+          type: static
+        customization:
+          autologon: yes
+          dns_servers:
+          - "{{ dns_1 }}"
+          - "{{ dns_2 }}"
+          domain: net.acceptance.co.uk
+          password: "{{ vm_password }}"
+       delegate_to: localhost
