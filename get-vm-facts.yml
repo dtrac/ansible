@@ -11,7 +11,7 @@
     prompt: "Enter vCenter user name"
     name: vcenter_password
     prompt: "Enter password for {{ vcenter_username }}"
-    name: vmsphere_datacenter
+    name: vsphere_datacenter
     prompt: "Enter vSphere Datacenter name"
     name: vm_name
     prompt: "Enter VM name"
