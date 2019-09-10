@@ -1,0 +1,25 @@
+
+filelist array
+
+foreach file in filelist {
+
+    check presence of existing file in remote location
+
+    if present {
+
+        check md5 sum of local files against remote files
+
+        if md5local == md5remote {
+            exit
+        }
+        else {
+            copy remote files and overwrite local
+        }
+
+    }
+    else (notpresent){
+        copy local files to remote location
+        exit
+    }
+
+}
