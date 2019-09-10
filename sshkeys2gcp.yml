@@ -14,43 +14,46 @@
     ignore_errors: true
 
   - name: Store file encrypted in bucket
-    command: /usr/local/gcloud/google-cloud-sdk/bin/gcloud kms encrypt --location europe --project pit-ansible-playbook-npd --keyring pit-ansible-playbook-npd --key pit-ansible-playbook-key-test001 --plaintext
--file /etc/ssh/{{ file }} --ciphertext-file - | /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp - gs://sshkeys_test/{{ file }}
+    shell: >
+        /usr/local/gcloud/google-cloud-sdk/bin/gcloud kms encrypt --location europe --project pit-ansible-playbook-npd --keyring pit-ansible-playbook-npd --key pit-ansible-playbook-key-test001 --plaintext -file /etc/ssh/{{ file }} --ciphertext-file - | 
+        /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp - gs://sshkeys_test/{{ file }}
     register:  copy_result
     when: presence_result.rc == 1
   
   - name: Store file md5 in bucket
-    command: md5sum /etc/ssh/{{ file }} | /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp - gs://sshkeys_test/{{ file }}.md5sum
+    shell: > 
+        md5sum /etc/ssh/{{ file }} | 
+        /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp - gs://sshkeys_test/{{ file }}.md5sum
     register:  md5_result
     when: presence_result.rc == 1
   - meta: end_play
     when: presence_result.rc == 1
   
-
-
   - name: Get remote file MD5 value
     shell: >
         /usr/local/gcloud/google-cloud-sdk/bin/gsutil cat gs://sshkeys_test/{{ file }}.md5sum
-        # | awk 'FNR == 3 {print $3}'
+        | awk 'FNR == 1 {print $1}'
     register: remote_md5
   
-  # - name: Debug remote_md5 output
-  #   debug:
-  #     var: remote_md5.stdout_lines
+  - name: Debug remote_md5 output
+    debug:
+      var: remote_md5.stdout_lines
 
   - name: Get local file MD5 value
     shell: >
         md5sum /etc/ssh/{{ file }} 
-        # | awk 'FNR == 2 {print $3}'
+        | awk 'FNR == 1 {print $1}'
     register: local_md5
   
-  # - name: Debug local_md5 output
-  #   debug:
-  #     var: local_md5.stdout_lines
+  - name: Debug local_md5 output
+    debug:
+      var: local_md5.stdout_lines
 
   - meta: end_play
     when: remote_md5.stdout_lines == local_md5.stdout_lines
   
   - name: Copying file from bucket
-    command: /usr/local/gcloud/google-cloud-sdk/bin/gsutil cat gs://sshkeys_test/{{ file }} | gcloud kms decrypt --location europe --project pit-ansible-playbook-npd --keyring pit-ansible-playbook-npd --key pit-ansible-playbook-key-test001 --ciphertext-file - --plaintext-file /etc/ssh/{{ file }}
+    shell: > 
+        /usr/local/gcloud/google-cloud-sdk/bin/gsutil cat gs://sshkeys_test/{{ file }} | 
+        gcloud kms decrypt --location europe --project pit-ansible-playbook-npd --keyring pit-ansible-playbook-npd --key pit-ansible-playbook-key-test001 --ciphertext-file - --plaintext-file /etc/ssh/{{ file }}
 ...
