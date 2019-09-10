@@ -7,18 +7,18 @@ foreach file in filelist {
 
     if present {
 
-        check md5 sum of local files against remote files
+        check md5 sum of local files against contents of remote files' md5 sidecar file
 
         if md5local == md5remote {
             exit
         }
         else {
-            copy remote files and overwrite local
+            download remote file, decrypt with KMS, and overwrite local
         }
 
     }
     else (notpresent){
-        copy local files to remote location
+        copy local files to remote location, piping through KMS on the way
         exit
     }
 

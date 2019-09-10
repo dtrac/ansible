@@ -13,17 +13,25 @@
     register: presence_result
     ignore_errors: true
 
-  - name: Copying file to bucket
-    command: /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp /etc/ssh/{{ file }} gs://sshkeys_test/{{ file }}
+  - name: Store file encrypted in bucket
+    command: /usr/local/gcloud/google-cloud-sdk/bin/gcloud kms encrypt --location europe --project pit-ansible-playbook-npd --keyring pit-ansible-playbook-npd --key pit-ansible-playbook-key-test001 --plaintext
+-file /etc/ssh/{{ file }} --ciphertext-file - | /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp - gs://sshkeys_test/{{ file }}
     register:  copy_result
+    when: presence_result.rc == 1
+  
+  - name: Store file md5 in bucket
+    command: md5sum /etc/ssh/{{ file }} | /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp - gs://sshkeys_test/{{ file }}.md5sum
+    register:  md5_result
     when: presence_result.rc == 1
   - meta: end_play
     when: presence_result.rc == 1
   
+
+
   - name: Get remote file MD5 value
     shell: >
-        /usr/local/gcloud/google-cloud-sdk/bin/gsutil hash -m gs://sshkeys_test/{{ file }} | 
-        awk 'FNR == 3 {print $3}'
+        /usr/local/gcloud/google-cloud-sdk/bin/gsutil cat gs://sshkeys_test/{{ file }}.md5sum
+        # | awk 'FNR == 3 {print $3}'
     register: remote_md5
   
   # - name: Debug remote_md5 output
@@ -32,8 +40,8 @@
 
   - name: Get local file MD5 value
     shell: >
-        /usr/local/gcloud/google-cloud-sdk/bin/gsutil hash -m /etc/ssh/{{ file }} | 
-        awk 'FNR == 2 {print $3}'
+        md5sum /etc/ssh/{{ file }} 
+        # | awk 'FNR == 2 {print $3}'
     register: local_md5
   
   # - name: Debug local_md5 output
@@ -44,5 +52,5 @@
     when: remote_md5.stdout_lines == local_md5.stdout_lines
   
   - name: Copying file from bucket
-    command: /usr/local/gcloud/google-cloud-sdk/bin/gsutil cp gs://sshkeys_test/{{ file }} /etc/ssh/{{ file }}
+    command: /usr/local/gcloud/google-cloud-sdk/bin/gsutil cat gs://sshkeys_test/{{ file }} | gcloud kms decrypt --location europe --project pit-ansible-playbook-npd --keyring pit-ansible-playbook-npd --key pit-ansible-playbook-key-test001 --ciphertext-file - --plaintext-file /etc/ssh/{{ file }}
 ...
