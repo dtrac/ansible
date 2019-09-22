@@ -1,0 +1,48 @@
+---
+- name: Create Web Server
+  hosts: all
+  gather_facts: true
+  tasks:
+  
+    - name: Install IIS
+      win_feature:
+        name: 'Web-Server'
+        include_sub_features: yes
+        include_management_tools: yes
+      notify: Reboot Server
+    
+    - name: Create Website directories
+      win_file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - 'C:\website'
+
+    - name: Copy folder contents recursively
+      win_copy:
+        src: files/website/
+        dest: C:\website
+
+    - name: Delete Default IIS Website
+      win_iis_website:
+        name: 'Default Web Site'
+        state: absent
+
+    - name: Configure Website
+      win_iis_website:
+        name: 'Sample Website'
+        physical_path: 'C:\website'
+        state: started
+    
+    - name: Enable inbound http traffic
+      win_firewall_rule:
+        action: allow
+        direction: in
+        localport: 80
+        name: 'Inbound http access'
+        protocol: tcp
+
+  handlers:
+    
+    - name: Reboot Server
+      win_reboot:
