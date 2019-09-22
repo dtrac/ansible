@@ -1,0 +1,30 @@
+---
+- name: Debug examples
+  hosts: all
+  gather_facts: true
+  tasks:
+
+    - name: Add a network static route
+      win_route:
+        destination: 2.2.2.2/32
+        gateway: 2.2.2.1
+        metric: 1
+        state: present
+      register: task_result
+
+    - name: Testing var debug 
+      debug:
+        var: task_result
+
+    - name: Testing msg debug
+      debug:
+        msg: System {{ task_result.output }}
+
+    - name: Debugging facts 
+      debug:
+        var: ansible_facts
+
+    - name: Debugging subset of facts 
+      debug:
+        msg: 
+          - "Ansible Architecture: {{ ansible_architecture }}"
