@@ -1,0 +1,12 @@
+---
+# This playbook deploys a simple standalone squid server.
+
+- hosts: squidservers
+
+  roles:
+    - squid-server
+
+- hosts: squidclients
+
+  roles:
+    - squid-client

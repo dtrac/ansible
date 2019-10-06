@@ -1,0 +1,5 @@
+[squidservers]
+192.168.33.10 ansible_user='vagrant' ansible_password='vagrant' ansible_connection=winrm ansible_port=5986 ansible_winrm_server_cert_validation=ignore ansible_winrm_transport=ntlm
+
+[squidclients]
+192.168.33.11 ansible_user='vagrant' ansible_password='vagrant' ansible_connection=winrm ansible_port=5986 ansible_winrm_server_cert_validation=ignore ansible_winrm_transport=ntlm
