@@ -1,0 +1,53 @@
+---
+# tasks file for squid-client
+
+- name: install chrome
+  win_chocolatey:
+    name: googlechrome
+    state: latest
+
+- name: gather chocolatey software inventory
+  win_chocolatey_facts:
+
+- name: debug chocolatey software inventory
+  debug:
+    var: ansible_chocolatey.packages
+
+- name: Configure IE proxy settings to apply to all users
+  win_regedit:
+    path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings
+    name: ProxySettingsPerUser
+    data: 0
+    type: dword
+    state: present
+
+- name: Configure IE to use explicit proxy host with port and without auto detection
+  win_inet_proxy:
+    auto_detect: no
+    proxy: "{{ proxy_server }}:{{ proxy_port }}"
+
+- name: Perform a GET and Store Output - google
+  win_uri:
+    url: https://google.co.uk
+    return_content: no
+  register: google_output
+  failed_when: google_output.status_code != 200
+
+
+- name: Debug response code from google
+  debug:
+    var: google_output.status_code
+
+- name: Perform a GET and Store Output - yahoo
+  win_uri:
+    url: https://yahoo.co.uk
+    return_content: no
+  register: yahoo_output
+  failed_when: yahoo_output.status_code != 403
+
+- name: Debug response code from yahoo
+  debug:
+    var: yahoo_output.status_code
+
+
+

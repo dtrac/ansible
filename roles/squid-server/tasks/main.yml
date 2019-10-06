@@ -1,0 +1,60 @@
+---
+- name: install squid
+  win_chocolatey:
+    name: squid
+    state: latest
+
+- name: gather chocolatey software inventory
+  win_chocolatey_facts:
+
+- name: debug chocolatey software inventory
+  debug:
+    var: ansible_chocolatey.packages
+
+- name: Enable firewall for Domain, Public and Private profiles
+  win_firewall:
+    state: enabled
+    profiles:
+    - Domain
+    - Private
+    - Public
+
+- name: Firewall rule to allow squid traffic
+  win_firewall_rule:
+    name: squid
+    localport: "{{ squid_port }}"
+    action: allow
+    direction: in
+    protocol: tcp
+    state: present
+    enabled: yes
+
+- name: configure squid port
+  win_lineinfile:
+    path: C:\Squid\etc\squid\squid.conf
+    regexp: '^http_port 3128'
+    line: "http_port {{ squid_port }}"
+    backup: yes
+  notify: restart squidsrv
+
+- name: Ensure the default whitelist is configured
+  win_lineinfile:
+    path: C:\Squid\etc\squid\squid.conf
+    insertafter: '^http_access allow localhost'
+    line: "acl whitelist dstdomain {{ whitelist }}"
+  notify: restart squidsrv
+
+- name: Allow whitelist
+  win_lineinfile:
+    path: C:\Squid\etc\squid\squid.conf
+    insertafter: "^acl whitelist dstdomain {{ whitelist }}"
+    line: http_access allow whitelist
+  notify: restart squidsrv
+
+- name: Deny default access
+  win_lineinfile:
+    path: C:\Squid\etc\squid\squid.conf
+    #regexp: "^http_access allow localnet"
+    line: '^http_access allow localnet'
+    state: absent
+  notify: restart squidsrv

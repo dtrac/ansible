@@ -1,0 +1,3 @@
+---
+# vars file for squid-server
+whitelist: '.google.co.uk .bbc.co.uk .chocolatey.org .google.com'

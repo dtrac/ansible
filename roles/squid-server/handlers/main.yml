@@ -1,0 +1,6 @@
+---
+# handlers file for squid-server
+- name: restart squidsrv
+  win_service:
+    name: squidsrv
+    state: restarted

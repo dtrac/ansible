@@ -1,0 +1,3 @@
+---
+# defaults file for squid-client
+proxy_port: '3128'
