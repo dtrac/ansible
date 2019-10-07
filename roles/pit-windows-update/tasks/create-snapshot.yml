@@ -1,0 +1,14 @@
+---
+
+- name: Create vm snapshot
+  gce_snapshot:
+    instance_name: "{{ hostname }}"
+    snapshot_name: "{{ hostname }}-snapshot"
+    state: present
+    disks:
+      - disk0
+    service_account_email: project_name@appspot.gserviceaccount.com
+    credentials_file: /path/to/credentials
+    project_id: {{ project_name }}
+  delegate_to: localhost
+  when: create_snapshot == yes

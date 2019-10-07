@@ -1,0 +1,22 @@
+---
+
+- debug:
+    msg: create_snapshot selected as {{ create_snapshot }}
+
+- debug:
+    msg: update_choco_packages selected as {{ update_choco_packages }}
+
+- name: Create VM Snapshot
+  include: ./create-snapshot.yml
+  when: create_snapshot == "yes"
+
+- name: Update Windows
+  include: ./update-windows.yml
+
+- name: Update chocolatey packages
+  include: ./update-choco-packages.yml
+  when: update_choco_packages == "yes"
+
+- name: Remove VM Snapshot
+  include: ./remove-snapshot.yml
+  when: (create_snapshot == "yes") # and the update processes were successful...
