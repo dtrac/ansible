@@ -30,11 +30,9 @@ Dependencies
 * A Windows Update source must be configured - usually via a vRO workflow or the installation of the SCCM client (e.g):
 
 ```
-    HKLM:\software\policies\Microsoft\Windows\WindowsUpdate\WUServer = $wsusServer
-```
-``` HKLM:\software\policies\Microsoft\Windows\WindowsUpdate\WUStatusServer = $wsusServer
-```
-``` HKLM:\software\policies\Microsoft\Windows\WindowsUpdate\AU\UseWUServer = 1
+HKLM:\software\policies\Microsoft\Windows\WindowsUpdate\WUServer = $wsusServer
+HKLM:\software\policies\Microsoft\Windows\WindowsUpdate\WUStatusServer = $wsusServer
+HKLM:\software\policies\Microsoft\Windows\WindowsUpdate\AU\UseWUServer = 1
 ```
 
 
