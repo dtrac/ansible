@@ -1,0 +1,70 @@
+---
+- hosts: gcp
+  gather_facts: yes
+  vars:
+    zone: us-central1-a
+    instance_name: instance-1
+    project_id: tidal-surf-250712
+    service_account_file: /Users/dan/Downloads/tidal-surf-250712-e8ebb3f4cdb3.json
+    timestamp: "{{ ansible_date_time.epoch }}"
+
+  tasks:
+  - name: return gcp instance facts
+    gcp_compute_instance_info:
+      zone: "{{ zone }}"
+      filters:
+      - name = "{{ instance_name }}"
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_file: "{{ service_account_file }}"
+    delegate_to: localhost
+    register: gcp_facts
+
+  - name: output gcp instance facts
+    debug:
+        var: gcp_facts
+
+  - name: output gcp disk 0 device name
+    debug:
+        var: gcp_facts['resources'][0]['disks'][0]['deviceName']
+
+  - name: create a snapshot
+    gcp_compute_snapshot:
+      name: "{{ instance_name }}-{{ timestamp }}"
+      source_disk: 
+        name: "{{ gcp_facts['resources'][0]['disks'][0]['deviceName'] }}"
+      zone: "{{ zone }}"
+      labels:
+        my_label: label-mclabelface
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_file: /Users/dan/Downloads/tidal-surf-250712-e8ebb3f4cdb3.json
+      state: present
+    register: create_task
+    delegate_to: localhost
+    failed_when: create_task.changed == false
+
+  - name: outcome of create snapshot task
+    debug:
+      var: create_task
+
+  - pause:
+      prompt: "Pausing to check snapshot creation..."
+
+  - name: remove a snapshot
+    gcp_compute_snapshot:
+      name: "{{ instance_name }}-{{ timestamp }}"
+      source_disk: 
+        name: "{{ gcp_facts['resources'][0]['disks'][0]['deviceName'] }}"
+      zone: "{{ zone }}"
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_file: /Users/dan/Downloads/tidal-surf-250712-e8ebb3f4cdb3.json
+      state: absent
+    register: destroy_task
+    delegate_to: localhost
+    failed_when: destroy_task.changed == false
+
+  - name: outcome of destroy snapshot task
+    debug:
+      var: destroy_task

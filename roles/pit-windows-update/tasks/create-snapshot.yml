@@ -1,14 +1,42 @@
 ---
+  tasks:
+  
+  - name: return gcp instance facts
+    gcp_compute_instance_info:
+      zone: "{{ zone }}"
+      filters:
+      - name = "{{ instance_name }}"
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_file: "{{ service_account_file }}"
+    delegate_to: localhost
+    register: gcp_facts
 
-- name: Create vm snapshot
-  gce_snapshot:
-    instance_name: "{{ hostname }}"
-    snapshot_name: "{{ hostname }}-snapshot"
-    state: present
-    disks:
-      - disk0
-    service_account_email: project_name@appspot.gserviceaccount.com
-    credentials_file: /path/to/credentials
-    project_id: {{ project_name }}
-  delegate_to: localhost
-  when: create_snapshot == yes
+  - name: output gcp instance facts
+    debug:
+        var: gcp_facts
+
+  - name: output gcp disk 0 device name
+    debug:
+        var: gcp_facts['resources'][0]['disks'][0]['deviceName']
+
+  - name: create a snapshot
+    gcp_compute_snapshot:
+      name: "{{ instance_name }}-{{ timestamp }}"
+      source_disk: 
+        name: "{{ gcp_facts['resources'][0]['disks'][0]['deviceName'] }}"
+      zone: "{{ zone }}"
+      labels:
+        my_label: label-mclabelface
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_file: /Users/dan/Downloads/tidal-surf-250712-e8ebb3f4cdb3.json
+      state: present
+    register: create_task
+    delegate_to: localhost
+    failed_when: create_task.changed == false
+    when: create_snapshot == "yes"
+
+  - name: outcome of create snapshot task
+    debug:
+      var: create_task

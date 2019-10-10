@@ -3,3 +3,14 @@
 
 [squidclients]
 192.168.33.11 ansible_user='vagrant' ansible_password='vagrant' ansible_connection=winrm ansible_port=5986 ansible_winrm_server_cert_validation=ignore ansible_winrm_transport=ntlm
+
+[patching]
+192.168.33.8 ansible_user='vagrant' ansible_password='vagrant' ansible_connection=winrm ansible_port=5986 ansible_winrm_server_cert_validation=ignore ansible_winrm_transport=ntlm
+192.168.33.16 ansible_user='vagrant' ansible_password='vagrant' ansible_connection=winrm ansible_port=5986 ansible_winrm_server_cert_validation=ignore ansible_winrm_transport=ntlm
+#192.168.33.19 ansible_user='vagrant' ansible_password='vagrant' ansible_connection=winrm ansible_port=5986 ansible_winrm_server_cert_validation=ignore ansible_winrm_transport=ntlm
+
+[win2008r2]
+192.168.33.8 ansible_user='vagrant' ansible_password='vagrant' ansible_connection=winrm ansible_port=5986 ansible_winrm_server_cert_validation=ignore ansible_winrm_transport=ntlm ansible_become=yes ansible_become_method=runas ansible_become_user=vagrant ansible_become_password=vagrant
+
+[gcp]
+localhost

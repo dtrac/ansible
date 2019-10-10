@@ -1,0 +1,7 @@
+---
+
+zone: us-central1-a
+instance_name: instance-1
+project_id: tidal-surf-250712
+service_account_file: /Users/dan/Downloads/tidal-surf-250712-e8ebb3f4cdb3.json
+timestamp: "{{ ansible_date_time.epoch }}"

@@ -5,8 +5,7 @@
     category_names:
     - CriticalUpdates
     - SecurityUpdates
-    use_scheduled_task: yes
-    state: searched
-    log_path: "C:\Windows\Temp\WUpdate.log"
+    state: installed
+    log_path: "C:\\Windows\\Temp\\WUpdate.log"
     reboot: yes
     reboot_timeout: 1200 # 20 mins

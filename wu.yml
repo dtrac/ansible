@@ -1,0 +1,15 @@
+---
+# This playbook deploys a simple standalone squid server.
+
+- hosts: patching
+  
+  pre_tasks:
+    - name: check PowerShell version (PS4+ required for scheduled task method
+      win_shell:  $PSversionTable.PSVersion.Major
+      register: psversion
+      changed_when: false
+      failed_when: psversion.stdout |int < 4
+
+  roles:
+
+    - pit-windows-update
