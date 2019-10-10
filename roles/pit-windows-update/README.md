@@ -6,7 +6,7 @@ Ansible role for installing Windows Updates.
 
 Requirements
 ------------
-
+PowerShell v4+ required to support the scheduled task method of installing updates.
 Supported OSes:
 
 - Windows Server 2008 SP2
@@ -46,7 +46,7 @@ Example playbook using the role.
     - hosts: all
       vars:
         create_snapshot: no
-        pdate_choco_packages: no
+        update_choco_packages: no
       roles:
          - pit-windows-update
 
