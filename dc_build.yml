@@ -26,6 +26,7 @@
   - name: Seed the beatles!
     win_domain_user:
       name: "{{ item }}"
+      password: 'Password123!!!'
       state: present
     loop:
       - john
