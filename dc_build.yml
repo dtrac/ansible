@@ -22,3 +22,13 @@
     win_reboot:
       msg: "Domain Controller config in progress; rebooting..."
     when: result.reboot_required
+    
+  - name: Seed the beatles!
+    win_domain_user:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - john
+      - paul
+      - george
+      - ringo
