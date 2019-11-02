@@ -1,0 +1,24 @@
+---
+- name: Simple Domain Controller Build
+  hosts: all
+  gather_facts: yes
+
+  tasks:
+  - name: Install AD Services feature
+    win_feature:
+      name: AD-Domain-Services
+      include_management_tools: yes
+      include_sub_features: yes
+      state: present
+    register: result
+
+  - name: Create new forest
+    win_domain:
+      dns_domain_name: trace.local
+      safe_mode_password: "{{ safe_mode_password }}"
+    register: result
+
+  - name: Reboot after creation
+    win_reboot:
+      msg: "Domain Controller config in progress; rebooting..."
+    when: result.reboot_required
