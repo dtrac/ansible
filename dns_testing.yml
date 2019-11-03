@@ -7,8 +7,10 @@
   - name: Create DNS A record
     win_dns_record:
       name: "server1"
+      value: "1.1.1.2"
       type: "A"
       zone: "net.trace.local"
+      state: present
       
   - name: Create DNS PTR record
     win_dns_record:
@@ -16,4 +18,4 @@
       type: "PTR"
       value: "server1"
       zone: "1.1.1.in-addr.arpa"
-      
+      state: present
