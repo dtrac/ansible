@@ -8,7 +8,6 @@
     win_dns_record:
       name: "server1"
       type: "A"
-      value: "server1.net.trace.local"
       zone: "net.trace.local"
       
   - name: Create DNS PTR record
