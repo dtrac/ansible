@@ -16,6 +16,6 @@
     win_dns_record:
       name: "2"
       type: "PTR"
-      value: "server1"
+      value: "server1.net.trace.local"
       zone: "1.1.1.in-addr.arpa"
       state: present
