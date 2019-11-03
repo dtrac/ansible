@@ -1,0 +1,20 @@
+---
+- name: DNS Testing
+  hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: Create DNS A record
+    win_dns_record:
+      name: "server1"
+      type: "A"
+      value: "server1.net.trace.local"
+      zone: "net.trace.local"
+      
+  - name: Create DNS PTR record
+    win_dns_record:
+      name: "2"
+      type: "PTR"
+      value: "server1"
+      zone: "1.1.1.in-addr.arpa"
+      
