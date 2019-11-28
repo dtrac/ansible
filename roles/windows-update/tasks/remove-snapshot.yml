@@ -1,0 +1,19 @@
+---
+- name: remove a snapshot
+  gcp_compute_snapshot:
+    name: "{{ inventory_hostname }}-{{ timestamp | int }}"
+    source_disk: 
+      name: "{{ gcp_disk.split('/')[10] }}"
+    zone: "{{ gce_zone }}"
+    project: "{{ gce_project_name }}"
+    auth_kind: serviceaccount
+    service_account_contents: "{{ json_creds | string }}"
+    state: absent
+  register: destroy_task
+  delegate_to: localhost
+  connection: "{{ connection }}"
+  failed_when: destroy_task.changed == false
+
+- name: outcome of destroy snapshot task
+  debug:
+    var: destroy_task

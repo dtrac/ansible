@@ -1,0 +1,47 @@
+---
+
+- name: include variables for manage-powerstate
+  include_vars: manage-powerstate.yml
+
+- name: input validation for power_state
+  fail:
+    msg: "power_state is not defined!"
+  when: power_state is not defined
+
+- name: check if power_state is supported
+  fail:
+    msg: "power_state is not in supported_states!"
+  when: power_state not in supported_states
+
+- debug:
+    msg: power_state selected as {{ power_state }}
+
+- name: Power Off VM
+  include_tasks: ./manage-powerstate.yml
+  vars:
+    power_state: "powered-off"
+  when: power_state == "powered-off"
+
+- name: Power On VM
+  include_tasks: ./manage-powerstate.yml
+  vars:
+    power_state: "powered-on"
+  when: power_state == "powered-on"
+
+- name: Restart VM 
+  include_tasks: ./manage-powerstate.yml
+  vars:
+    power_state: "restarted"
+  when: power_state == "restarted"
+
+- name: Reboot VM Guest OS
+  include_tasks: ./manage-powerstate.yml
+  vars:
+    power_state: "reboot-guest"
+  when: power_state == "reboot-guest"
+
+- name: Shutdown VM Guest OS
+  include_tasks: ./manage-powerstate.yml
+  vars:
+    power_state: "shutdown-guest"
+  when: power_state == "shutdown-guest"

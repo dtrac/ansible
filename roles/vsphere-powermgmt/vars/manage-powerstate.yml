@@ -1,0 +1,7 @@
+---
+supported_states:
+  - powered-off
+  - powered-on
+  - reboot-guest
+  - restarted
+  - shutdown-guest

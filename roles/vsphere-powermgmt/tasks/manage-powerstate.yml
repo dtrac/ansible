@@ -1,0 +1,43 @@
+---
+
+- name: Set connection fact
+  set_fact:
+    connection: "{% if inventory_hostname == \"localhost\" -%}local{% else -%}winrm{%- endif %}"
+
+- name: output vcenter_host
+  debug:
+    var: vcenter_host
+
+- name: output inventory_hostname
+  debug:
+    var: inventory_hostname
+
+- name: find vm location
+  vmware_guest_find:
+    hostname: "{{ vcenter_host }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    name: "{{ vm_name }}"
+  delegate_to: localhost
+  connection: "{{ connection }}"
+  register: vm_location
+
+- name: output vm_location
+  debug:
+    var: vm_location
+
+- name: manage vm power state
+  vmware_guest_powerstate:
+    hostname: "{{ vcenter_host }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    force: "{{ force }}"
+    folder: "{{ vm_location.folders[0] }}"
+    name: "{{ vm_name }}"
+    state: "{{ power_state }}"
+    state_change_timeout: "{{ state_change_timeout }}"
+    validate_certs: no
+  delegate_to: localhost
+  connection: "{{ connection }}"
+  register: powerstate_result

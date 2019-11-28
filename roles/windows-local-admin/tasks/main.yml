@@ -1,0 +1,50 @@
+---
+
+- name: output new_admin_username
+  debug:
+    msg: "{{ new_admin_username }}"
+
+- name: output inventory_hostname
+  debug:
+    var: inventory_hostname
+
+- name: Ensure new admin user is present
+  win_user:
+    name: "{{ new_admin_username }}"
+    fullname: "New Local Administrator"
+    description: "New Local Administrator"
+    password: "{{ new_admin_password }}"
+    state: present
+    password_never_expires: yes
+    user_cannot_change_password: yes
+    groups:
+      - Administrators
+
+- name: Rename Guest Account
+  win_shell: |
+    if (Get-LocalUser Guest -ErrorAction SilentlyContinue){
+      Rename-LocalUser -Name 'Guest' -NewName 'NoGuestsAllowed'
+    }
+
+- name: Ensure Guest Account is disabled
+  win_user:
+    name: NoGuestsAllowed
+    account_disabled: yes
+
+- name: Ensure existing Administrator account is disabled
+  win_user:
+    name: Administrator
+    account_disabled: yes
+    password: "{{ outgoing_admin_password }}"
+
+- name: Manage user rights for new local admin account
+  win_user_right:
+    name: "{{ item }}"
+    users:
+    - "{{ new_admin_username }}"
+    action: add
+  with_items:
+    - SeDenyRemoteInteractiveLogonRight
+    - SeDenyNetworkLogonRight
+    - SeDenyBatchLogonRight
+    - SeDenyServiceLogonRight

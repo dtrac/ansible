@@ -1,0 +1,112 @@
+---
+- hosts: all
+  max_fail_percentage: 80
+  serial: 10
+  gather_facts: yes
+
+  vars:
+    timestamp: "{{ ansible_date_time.epoch }}"
+
+  tasks:
+  - name: Set connection fact
+    set_fact:
+      connection: "{% if inventory_hostname == \"localhost\" -%}local{% else -%}winrm{%- endif %}"
+
+  #- name: output json creds
+  #  debug:
+  #    var: json_creds
+
+  - name: output timestamp
+    debug:
+      var: "{{ timestamp | int }}"
+
+  - name: output inventory_hostname
+    debug:
+      var: inventory_hostname
+
+  - name: return gcp instance facts
+    gcp_compute_instance_info:
+      zone: "{{ zone }}"
+      filters:
+      - name = "{{ inventory_hostname }}"
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_contents: "{{ json_creds | string }}"
+    delegate_to: localhost
+    connection: "{{ connection }}"
+    register: gcp_facts
+
+  - name: output gcp instance facts
+    debug:
+      var: gcp_facts
+
+  - name: output gcp disk 0 device name
+    debug:
+      var: gcp_facts['resources'][0]['disks'][0]['deviceName']
+
+  - name: create a snapshot
+    gcp_compute_snapshot:
+      name: "{{ inventory_hostname }}-{{ timestamp | int }}"
+      source_disk: 
+        name: "{{ gcp_facts['resources'][0]['disks'][0]['deviceName'] }}"
+      zone: "{{ zone }}"
+      labels:
+        my_label: "windows-update-snapshot-{{ timestamp | int }}"
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_contents: "{{ json_creds | string }}"
+      state: present
+    register: create_task
+    delegate_to: localhost
+    connection: "{{ connection }}"
+    failed_when: create_task.changed == false
+
+  - name: outcome of create snapshot task
+    debug:
+      var: create_task
+  
+  - name: Perform Windows Updates 
+    win_updates:
+      category_names:
+      - CriticalUpdates
+      - SecurityUpdates
+      state: installed
+      log_path: "C:\\Windows\\Temp\\WUpdate.log"
+      reboot: yes
+      reboot_timeout: 1200 # 20 mins
+      
+  # TODO: Revert to snapshot on failure of Windows Updates
+  
+  - name: Gather facts from chocolatey
+    win_chocolatey_facts:
+    
+  - name: Displays the chocolatey packages
+    debug:
+      var: ansible_chocolatey.packages
+      
+  - name: Updates all chocolatey packages
+    win_chocolatey:
+      name: "{{ item.package }}"
+      state: latest
+    loop: "{{ ansible_chocolatey.packages }}"
+    
+  # TODO: Revert to snapshot on failure of chocolatey Updates
+  
+  - name: remove a snapshot
+    gcp_compute_snapshot:
+      name: "{{ inventory_hostname }}-{{ timestamp | int }}"
+      source_disk: 
+        name: "{{ gcp_facts['resources'][0]['disks'][0]['deviceName'] }}"
+      zone: "{{ zone }}"
+      project: "{{ project_id }}"
+      auth_kind: serviceaccount
+      service_account_contents: "{{ json_creds | string }}"
+      state: absent
+    register: destroy_task
+    delegate_to: localhost
+    connection: "{{ connection }}"
+    failed_when: destroy_task.changed == false
+
+  - name: outcome of destroy snapshot task
+    debug:
+      var: destroy_task

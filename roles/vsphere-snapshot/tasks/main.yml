@@ -1,0 +1,35 @@
+---
+
+- name: include variables for manage-snapshot
+  include_vars: manage-snapshot.yml
+
+- name: input validation for snapshot_state
+  fail:
+    msg: "snapshot_state is not defined!"
+  when: snapshot_state is not defined
+
+- name: check if snapshot_state is supported
+  fail:
+    msg: "snapshot_state is not in supported_states!"
+  when: snapshot_state not in supported_states
+
+- debug:
+    msg: snapshot_state selected as {{ snapshot_state }}
+
+- name: Create VM Snapshot
+  include_tasks: ./manage-snapshot.yml
+  vars:
+    snapshot_state: "present"
+  when: snapshot_state == "present"
+
+- name: Remove VM Snapshot
+  include_tasks: ./manage-snapshot.yml
+  vars:
+    snapshot_state: "absent"
+  when: snapshot_state == "absent"
+
+- name: Revert to VM Snapshot
+  include_tasks: ./manage-snapshot.yml
+  vars:
+    snapshot_state: "revert"
+  when: snapshot_state == "revert"

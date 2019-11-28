@@ -1,0 +1,70 @@
+---
+
+- name: Set connection fact
+  set_fact:
+    connection: "{% if inventory_hostname == \"localhost\" -%}local{% else -%}winrm{%- endif %}"
+
+- block: 
+    - name: get timestamp
+      setup:
+        filter: 'ansible_date_time'
+      delegate_to: localhost
+      connection: "{{ connection }}"
+      
+    - name: set timestamp  
+      set_fact:
+        timestamp: "{{ ansible_date_time.date }}"
+
+    - name: output timestamp
+      debug:
+        var: "{{ timestamp }}"
+
+    - name: set snapshot name
+      set_fact:
+        snapshot_name: "ansible_snapshot_{{ timestamp }}"
+
+    - name: output snapshot name
+      debug:
+        var: "{{ snapshot_name }}"
+  when:
+    - snapshot_name is undefined or (snapshot_name | length == 0)
+
+
+- name: output vcenter_host
+  debug:
+    var: vcenter_host
+
+- name: output inventory_hostname
+  debug:
+    var: inventory_hostname
+
+- name: find vm location
+  vmware_guest_find:
+    hostname: "{{ vcenter_host }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    name: "{{ vm_name }}"
+  delegate_to: localhost
+  connection: "{{ connection }}"
+  register: vm_location
+
+- name: output vm_location
+  debug:
+    var: vm_location
+
+- name: manage vm snapshot
+  vmware_guest_snapshot:
+    hostname: "{{ vcenter_host }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vm_location.folders[0].split('/')[1] }}"
+    folder: "{{ vm_location.folders[0] }}"
+    name: "{{ vm_name }}"
+    state: "{{ snapshot_state }}"
+    snapshot_name: "{{ vm_name }}-ansible-snapshot"
+    snapshot_name: "{{ snapshot_name | default(default_snapshot_name) }}"
+    description: "{{ vm_name }}-{{ timestamp }}"
+    validate_certs: no
+  delegate_to: localhost
+  connection: "{{ connection }}"

@@ -1,0 +1,5 @@
+---
+supported_states:
+  - present
+  - absent
+  - revert

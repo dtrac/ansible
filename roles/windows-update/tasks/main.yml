@@ -1,0 +1,22 @@
+---
+
+- debug:
+    msg: create_snapshot selected as {{ create_snapshot }}
+
+- debug:
+    msg: update_choco_packages selected as {{ update_choco_packages }}
+
+- name: Create VM Snapshot
+  include_tasks: ./create-snapshot.yml
+  when: create_snapshot 
+
+- name: Update Windows
+  include_tasks: ./update-windows.yml
+
+- name: Update chocolatey packages
+  include_tasks: ./update-choco-packages.yml
+  when: update_choco_packages 
+
+- name: Remove VM Snapshot
+  include_tasks: ./remove-snapshot.yml
+  when: (create_snapshot) and (wu_result is succeeded) and (update_choco_result is succeeded)

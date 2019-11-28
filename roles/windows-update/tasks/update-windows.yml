@@ -1,0 +1,15 @@
+---
+- name: perform windows updates 
+  win_updates:
+    category_names:
+    - CriticalUpdates
+    - SecurityUpdates
+    state: installed
+    log_path: "C:\\Windows\\Temp\\WUpdate.log"
+    reboot: yes
+    reboot_timeout: 1200 # 20 mins
+  register: wu_result
+
+- name: outcome of perform windows updates 
+  debug:
+    var: wu_result

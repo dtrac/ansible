@@ -1,0 +1,14 @@
+---
+- name: gather facts from chocolatey
+  win_chocolatey_facts:
+  
+- name: displays the chocolatey packages
+  debug:
+    var: ansible_chocolatey.packages
+    
+- name: updates all chocolatey packages
+  win_chocolatey:
+    name: "{{ item.package }}"
+    state: latest
+  loop: "{{ ansible_chocolatey.packages }}"
+  register: update_choco_result

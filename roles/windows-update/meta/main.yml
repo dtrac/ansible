@@ -1,0 +1,22 @@
+galaxy_info:
+  author: Dan Tracey
+  description: Infrastructure Automation Engineer
+  company: Trace Security Ltd
+
+  license: license (GPL-2.0-or-later, MIT, etc)
+
+  min_ansible_version: 2.9
+
+  # platforms:
+  # - name: Windows
+  #   versions:
+    # - Windows Server 2008 SP2
+    # - Windows Server 2008 R2 SP1
+    # - Windows Server 2012
+    # - Windows Server 2012 R2
+    # - Windows Server 2016
+    # - Windows Server 2019
+
+  galaxy_tags: []
+  dependencies: []
+  

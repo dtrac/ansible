@@ -1,0 +1,66 @@
+---
+
+- name: set timestamp
+  set_fact:
+    timestamp: "{{ ansible_date_time.epoch }}"
+
+- name: Set connection fact
+  set_fact:
+    connection: "{% if inventory_hostname == \"localhost\" -%}local{% else -%}winrm{%- endif %}"
+
+- name: output timestamp
+  debug:
+    var: "{{ timestamp | int }}"
+
+- name: output inventory_hostname
+  debug:
+    var: inventory_hostname
+
+- name: return gcp instance facts
+  gcp_compute_instance_info:
+    zone: "{{ gce_zone }}"
+    filters:
+    - name = "{{ inventory_hostname }}"
+    project: "{{ gce_project_name }}"
+    auth_kind: serviceaccount
+    service_account_contents: "{{ json_creds | string }}"
+  delegate_to: localhost
+  connection: "{{ connection }}"
+  register: gcp_facts
+
+- name: output gcp instance facts
+  debug:
+    var: gcp_facts
+
+- name: set gcp disk name
+  set_fact:
+    gcp_disk: "{{ gcp_facts['resources'][0]['disks'][0]['source'] }}"
+
+- name: output gcp disk 0 device name
+  debug:
+    var: gcp_facts['resources'][0]['disks'][0]['deviceName']
+
+- name: output gcp disk name
+  debug:
+    msg: "{{ gcp_disk.split('/')[10] }}"
+
+- name: create a snapshot
+  gcp_compute_snapshot:
+    name: "{{ inventory_hostname }}-{{ timestamp | int }}"
+    source_disk: 
+      name: "{{ gcp_disk.split('/')[10] }}"
+    zone: "{{ gce_zone }}"
+    labels:
+      my_label: "windows-update-snapshot-{{ timestamp | int }}"
+    project: "{{ gce_project_name }}"
+    auth_kind: serviceaccount
+    service_account_contents: "{{ json_creds | string }}"
+    state: present
+  register: create_snapshot_result
+  delegate_to: localhost
+  connection: "{{ connection }}"
+  failed_when: create_snapshot_result.changed == false
+
+- name: outcome of create snapshot task
+  debug:
+    var: create_snapshot_result

@@ -1,0 +1,7 @@
+---
+
+zone: europe-west2-b
+instance_name: ukgcp1-2
+project_id: test-iaas-nonprod
+service_account_file: ./creds.json
+timestamp: "{{ ansible_date_time.epoch }}"
